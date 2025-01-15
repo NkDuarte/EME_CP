@@ -1,90 +1,99 @@
 -- Crear la base de datos
 CREATE DATABASE IF NOT EXISTS eme_database;
 USE eme_database;
-
--- Tabla de Proveedores
-CREATE TABLE IF NOT EXISTS suppliers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    contact_name VARCHAR(255),
-    contact_email VARCHAR(255),
-    phone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Tabla de Productos
-CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    stock INT NOT NULL DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    supplier_id INT,  -- Relación con proveedor
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
-);
-
--- Tabla de Clientes
-CREATE TABLE IF NOT EXISTS clients (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Tabla de Pedidos
-CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    total_price DECIMAL(10, 2) NOT NULL,
-    status ENUM('pending', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    client_id INT,  -- Relación con cliente
-    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
-);
-
--- Tabla intermedia para la relación muchos a muchos entre pedidos y productos
-CREATE TABLE IF NOT EXISTS order_products (
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    price_at_order DECIMAL(10, 2) NOT NULL,  -- El precio del producto al momento del pedido
-    PRIMARY KEY (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
--- Tabla de Categorías (opcional, si se necesita para clasificar productos)
-CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Relación de productos con categorías
-CREATE TABLE IF NOT EXISTS product_categories (
-    product_id INT NOT NULL,
-    category_id INT NOT NULL,
-    PRIMARY KEY (product_id, category_id),
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
-
--- Tabla de Direcciones de Envío
-CREATE TABLE IF NOT EXISTS shipping_addresses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    address VARCHAR(255) NOT NULL,
-    city VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    country VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-);
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 15-01-2025 a las 21:49:04
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */
+;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */
+;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */
+;
+/*!40101 SET NAMES utf8mb4 */
+;
+--
+-- Base de datos: `eme_database`
+--
+-- --------------------------------------------------------
+--
+-- Estructura de tabla para la tabla `products`
+--
+CREATE TABLE `products` (
+    `id` int(11) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `description` text DEFAULT NULL,
+    `price` decimal(10, 2) NOT NULL,
+    `stock` int(11) NOT NULL DEFAULT 0,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    `supplier_id` int(11) DEFAULT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+-- --------------------------------------------------------
+--
+-- Estructura de tabla para la tabla `suppliers`
+--
+CREATE TABLE `suppliers` (
+    `id` int(11) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `phone` varchar(20) DEFAULT NULL,
+    `address` varchar(255) NOT NULL,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+--
+-- Volcado de datos para la tabla `suppliers`
+--
+--
+-- Índices para tablas volcadas
+--
+--
+-- Indices de la tabla `products`
+--
+ALTER TABLE `products`
+ADD PRIMARY KEY (`id`),
+    ADD KEY `supplier_id` (`supplier_id`);
+--
+-- Indices de la tabla `suppliers`
+--
+ALTER TABLE `suppliers`
+ADD PRIMARY KEY (`id`);
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+--
+-- AUTO_INCREMENT de la tabla `products`
+--
+ALTER TABLE `products`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+    AUTO_INCREMENT = 6;
+--
+-- AUTO_INCREMENT de la tabla `suppliers`
+--
+ALTER TABLE `suppliers`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+    AUTO_INCREMENT = 7;
+--
+-- Restricciones para tablas volcadas
+--
+--
+-- Filtros para la tabla `products`
+--
+ALTER TABLE `products`
+ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE
+SET NULL;
+COMMIT;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
+;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
+;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */
+;

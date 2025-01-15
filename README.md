@@ -47,26 +47,25 @@ project/
 3. **Configurar la base de datos**:
    Crear la base `eme_database` y ejecutar:
    ```sql
-    CREATE TABLE suppliers (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        contact_name VARCHAR(255),
-        ontact_email VARCHAR(255),
-        phone VARCHAR(20),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
-    CREATE TABLE products (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        price DECIMAL(10, 2) NOT NULL,
-        stock INT NOT NULL DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        supplier_id INT,  -- Relación con proveedor
-        FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
-    );
+    CREATE TABLE `products` (
+    `id` int(11) NOT NULL,
+    `name` varchar(255) NOT NULL,
+    `description` text DEFAULT NULL,
+    `price` decimal(10, 2) NOT NULL,
+    `stock` int(11) NOT NULL DEFAULT 0,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    `supplier_id` int(11) DEFAULT NULL
+   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+   
+   CREATE TABLE `suppliers` (
+      `id` int(11) NOT NULL,
+      `name` varchar(255) NOT NULL,
+      `phone` varchar(20) DEFAULT NULL,
+      `address` varchar(255) NOT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+   ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
    ```
 4. **Editar configuración**:
     Modificar `config/database.php`:
@@ -79,7 +78,9 @@ project/
     ];
     ```
 5. **Ejecutar el proyecto**:
-   Accede en el navegador a `http://localhost/EME_CP/public`.
+   Accede en el navegador a `http://localhost:port`.
+   ```bash
+   php -S localhost:8080 -t public
 
 ---
 
